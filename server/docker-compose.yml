@@ -1,0 +1,67 @@
+# https://hub.docker.com/_/wordpress/
+version: "3.3"
+
+networks:
+  backend:
+  traefik-public:
+    external: true
+
+services:
+  wordpress:
+    depends_on:
+      - database
+    image: wordpress:5.5.3
+    restart: unless-stopped
+    volumes:
+      - ./data/wordpress:/var/www/html/wp-content
+    environment:
+      WORDPRESS_DB_HOST: database:3306
+      WORDPRESS_DB_USER: $WP_DB_USER
+      WORDPRESS_DB_PASSWORD: $WP_DB_PASS
+      WORDPRESS_DB_NAME: $WP_DB_NAME
+    labels:
+      - traefik.enable=true
+      - traefik.docker.network=traefik-public
+      - traefik.http.routers.wordpress.rule=Host(`$SUBDOMAIN_WP.$DOMAIN`)
+      - traefik.http.routers.wordpress.entrypoints=websecure
+      - traefik.http.routers.wordpress.service=wordpress
+      - traefik.http.routers.wordpress.tls=true
+      - traefik.http.routers.wordpress.tls.certresolver=le
+      - traefik.http.services.wordpress.loadbalancer.server.port=80
+    networks:
+      - backend
+      - traefik-public
+
+  database:
+    image: mysql:5.7
+    restart: unless-stopped
+    volumes:
+      - ./data/db:/var/lib/mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: $WP_ROOT_DB_PASS
+      MYSQL_DATABASE: $WP_DB_NAME
+      MYSQL_USER: $WP_DB_USER
+      MYSQL_PASSWORD: $WP_DB_PASS
+    networks:
+      - backend
+
+  phpmyadmin:
+    depends_on:
+      - database
+    restart: unless-stopped
+    image: phpmyadmin/phpmyadmin:latest
+    environment:
+      PMA_HOST: database
+      MYSQL_ROOT_PASSWORD: $WP_ROOT_DB_PASS
+    labels:
+      - traefik.enable=true
+      - traefik.docker.network=traefik-public
+      - traefik.http.routers.phpmyadmin.rule=Host(`$SUBDOMAIN_MYADMIN.$DOMAIN`)
+      - traefik.http.routers.phpmyadmin.entrypoints=websecure
+      - traefik.http.routers.phpmyadmin.service=phpmyadmin
+      - traefik.http.routers.phpmyadmin.tls=true
+      - traefik.http.routers.phpmyadmin.tls.certresolver=le
+      - traefik.http.services.phpmyadmin.loadbalancer.server.port=80
+    networks:
+      - backend
+      - traefik-public
