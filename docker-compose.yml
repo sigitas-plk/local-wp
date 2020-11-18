@@ -1,23 +1,6 @@
 # https://hub.docker.com/_/wordpress/
 version: "3.1"
 services:
-  wordpress:
-    depends_on:
-      - database
-    image: wordpress:5.5.3-apache
-    restart: unless-stopped
-    volumes:
-      - ./data/wordpress:/var/www/html/wp-content
-    environment:
-      WORDPRESS_DB_HOST: database:3306
-      WORDPRESS_DB_USER: wordpress
-      WORDPRESS_DB_PASSWORD: wordpress
-      WORDPRESS_DB_NAME: wordpress
-    ports:
-      - 80:80
-    networks:
-      - backend
-
   database:
     image: mysql:5.7
     restart: unless-stopped
@@ -28,6 +11,26 @@ services:
       MYSQL_DATABASE: wordpress
       MYSQL_USER: wordpress
       MYSQL_PASSWORD: wordpress
+    networks:
+      - backend
+
+  wordpress:
+    depends_on:
+      - database
+    image: sigitasp/wp-with-plugins-dev:latest
+    # build:
+    #   context: ./wp-with-plugins-dev
+    #   dockerfile: Dockerfile
+    restart: unless-stopped
+    volumes:
+      - ./data/wordpress:/var/www/html/wp-content
+    environment:
+      WORDPRESS_DB_HOST: database:3306
+      WORDPRESS_DB_USER: wordpress
+      WORDPRESS_DB_PASSWORD: wordpress
+      WORDPRESS_DB_NAME: wordpress
+    ports:
+      - 80:80
     networks:
       - backend
 

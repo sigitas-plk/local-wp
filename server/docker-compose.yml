@@ -10,7 +10,7 @@ services:
   wordpress:
     depends_on:
       - database
-    image: wordpress:5.5.3
+    image: sigitasp/wp-with-plugins-dev:latest
     restart: unless-stopped
     volumes:
       - ./data/wordpress:/var/www/html/wp-content

@@ -27,5 +27,8 @@ After you're done, you can stop running containers by running in directory with 
 Remove any 'leftover' containers: \
 `docker-compose rm -f`
 
+## But I don't want wordpress with pre-isntalled plugins 
+To use plain wordpress image change change wordpress service image to `image: wordpress:5.5.3-apache` (or any other version). 
+
 ## Modifying themes / files / accessing db files
 Wordpress and DB files are mounted on **data** directory of your docker-compose.yml file. 
