@@ -32,3 +32,8 @@ To use plain wordpress image change change wordpress service image to `image: wo
 
 ## Modifying themes / files / accessing db files
 Wordpress and DB files are mounted on **data** directory of your docker-compose.yml file. 
+
+## FTP deets? 
+If you are getting ftp authentication required or any other issues while interacting with WP, make sure your file permissions are set correctly.\
+By default your data folder (if created by docker) will be owned by root. \
+You'll need to change ownership of wordpress dir and all subdirs with `chown -R <user>:<group> data/wordpress`
